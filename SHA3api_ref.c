@@ -20,24 +20,8 @@
 /* select the context size and init the context */
 HashReturn Init(hashState *state, int hashbitlen)
     {
-#if SKEIN_256_NIST_MAX_HASH_BITS
-    if (hashbitlen <= SKEIN_256_NIST_MAX_HASHBITS)
-        {
-        Skein_Assert(hashbitlen > 0,BAD_HASHLEN);
-        state->statebits = 64*SKEIN_256_STATE_WORDS;
-        return Skein_256_Init(&state->u.ctx_256,(size_t) hashbitlen);
-        }
-#endif
-    if (hashbitlen <= SKEIN_512_NIST_MAX_HASHBITS)
-        {
-        state->statebits = 64*SKEIN_512_STATE_WORDS;
-        return Skein_512_Init(&state->u.ctx_512,(size_t) hashbitlen);
-        }
-    else
-        {
-        state->statebits = 64*SKEIN1024_STATE_WORDS;
-        return Skein1024_Init(&state->u.ctx1024,(size_t) hashbitlen);
-        }
+      state->statebits = 64*SKEIN1024_STATE_WORDS;
+      return Skein1024_Init(&state->u.ctx1024,(size_t) hashbitlen);
     }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -50,13 +34,7 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
     Skein_Assert(state->statebits % 256 == 0 && (state->statebits-256) < 1024,FAIL);
     if ((databitlen & 7) == 0)  /* partial bytes? */
         {
-        switch ((state->statebits >> 8) & 3)
-            {
-            case 2:  return Skein_512_Update(&state->u.ctx_512,data,databitlen >> 3);
-            case 1:  return Skein_256_Update(&state->u.ctx_256,data,databitlen >> 3);
-            case 0:  return Skein1024_Update(&state->u.ctx1024,data,databitlen >> 3);
-            default: return FAIL;
-            }
+            return Skein1024_Update(&state->u.ctx1024,data,databitlen >> 3);
         }
     else
         {   /* handle partial final byte */
@@ -66,19 +44,8 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
         mask = (u08b_t) (1u << (7 - (databitlen & 7)));       /* partial byte bit mask */
         b    = (u08b_t) ((data[bCnt-1] & (0-mask)) | mask);   /* apply bit padding on final byte */
 
-        switch ((state->statebits >> 8) & 3)
-            {
-            case 2:  Skein_512_Update(&state->u.ctx_512,data,bCnt-1); /* process all but the final byte    */
-                     Skein_512_Update(&state->u.ctx_512,&b  ,  1   ); /* process the (masked) partial byte */
-                     break;
-            case 1:  Skein_256_Update(&state->u.ctx_256,data,bCnt-1); /* process all but the final byte    */
-                     Skein_256_Update(&state->u.ctx_256,&b  ,  1   ); /* process the (masked) partial byte */
-                     break;
-            case 0:  Skein1024_Update(&state->u.ctx1024,data,bCnt-1); /* process all but the final byte    */
-                     Skein1024_Update(&state->u.ctx1024,&b  ,  1   ); /* process the (masked) partial byte */
-                     break;
-            default: return FAIL;
-            }
+        Skein1024_Update(&state->u.ctx1024,data,bCnt-1); /* process all but the final byte    */
+        Skein1024_Update(&state->u.ctx1024,&b  ,  1   ); /* process the (masked) partial byte */
         Skein_Set_Bit_Pad_Flag(state->u.h);                    /* set tweak flag for the final call */
         
         return SUCCESS;
@@ -90,13 +57,7 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
 HashReturn Final(hashState *state, BitSequence *hashval)
     {
     Skein_Assert(state->statebits % 256 == 0 && (state->statebits-256) < 1024,FAIL);
-    switch ((state->statebits >> 8) & 3)
-        {
-        case 2:  return Skein_512_Final(&state->u.ctx_512,hashval);
-        case 1:  return Skein_256_Final(&state->u.ctx_256,hashval);
-        case 0:  return Skein1024_Final(&state->u.ctx1024,hashval);
-        default: return FAIL;
-        }
+    return Skein1024_Final(&state->u.ctx1024,hashval);
     }
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/

@@ -30,8 +30,6 @@ typedef struct
     union
         {
         Skein_Ctxt_Hdr_t h;                 /* common header "overlay" */
-        Skein_256_Ctxt_t ctx_256;
-        Skein_512_Ctxt_t ctx_512;
         Skein1024_Ctxt_t ctx1024;
         } u;
     }
@@ -45,22 +43,5 @@ HashReturn Final (hashState *state,       BitSequence *hashval);
 /* "all-in-one" call */
 HashReturn Hash  (int hashbitlen,   const BitSequence *data, 
                   DataLength databitlen,  BitSequence *hashval);
-
-
-/*
-** Re-define the compile-time constants below to change the selection
-** of the Skein state size in the Init() function in SHA3api_ref.c.
-**
-** That is, the NIST API does not allow for explicit selection of the
-** Skein block size, so it must be done implicitly in the Init() function.
-** The selection is controlled by these constants.
-*/
-#ifndef SKEIN_256_NIST_MAX_HASHBITS
-#define SKEIN_256_NIST_MAX_HASHBITS (0)
-#endif
-
-#ifndef SKEIN_512_NIST_MAX_HASHBITS
-#define SKEIN_512_NIST_MAX_HASHBITS (512)
-#endif
 
 #endif  /* ifdef _AHS_API_H_ */
