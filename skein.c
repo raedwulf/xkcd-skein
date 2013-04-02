@@ -147,11 +147,3 @@ int Skein1024_Final(Skein1024_Ctxt_t *ctx, u08b_t *hashVal)
         }
     return SKEIN_SUCCESS;
     }
-
-#if defined(SKEIN_CODE_SIZE) || defined(SKEIN_PERF)
-size_t Skein1024_API_CodeSize(void)
-    {
-    return ((u08b_t *) Skein1024_API_CodeSize) -
-           ((u08b_t *) Skein1024_Init);
-    }
-#endif

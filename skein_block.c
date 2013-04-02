@@ -282,16 +282,4 @@ void Skein1024_Process_Block(Skein1024_Ctxt_t *ctx,const u08b_t *blkPtr,size_t b
     ctx->h.T[0] = ts[0];
     ctx->h.T[1] = ts[1];
     }
-
-#if defined(SKEIN_CODE_SIZE) || defined(SKEIN_PERF)
-size_t Skein1024_Process_Block_CodeSize(void)
-    {
-    return ((u08b_t *) Skein1024_Process_Block_CodeSize) -
-           ((u08b_t *) Skein1024_Process_Block);
-    }
-uint_t Skein1024_Unroll_Cnt(void)
-    {
-    return SKEIN_UNROLL_1024;
-    }
-#endif
 #endif
