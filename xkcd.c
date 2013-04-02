@@ -1,9 +1,4 @@
-/* This needs the Skein functions from the NIST distribution. You can
- * get the zip file from http://www.schneier.com/skein.html ("Source
- * code and test vectors for Skein and Threefish (12 MB)"), and then
- * you need to stick the contents of NIST/CD/Reference_Implementation
- * in the same directory as this file.
- *
+/*
  * Compile with gcc -O3 -std=c99 *.c -lcurl -lpthread -DSHIFT_CHAR -o xkcd-skein
 */
  
